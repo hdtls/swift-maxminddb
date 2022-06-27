@@ -1,3 +1,3 @@
 # swift-maxminddb
 
-A description of this package.
+Swift MaxMindDB is an open-source implementation of C libmaxminddb.
