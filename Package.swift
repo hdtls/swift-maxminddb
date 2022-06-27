@@ -8,8 +8,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "swift-maxminddb",
-            targets: ["swift-maxminddb"]),
+            name: "MaxMindDB",
+            targets: ["MaxMindDB"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -19,10 +19,18 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "swift-maxminddb",
-            dependencies: []),
+            name: "CMaxMindDB",
+            cSettings: [
+                .define("PACKAGE_VERSION", to: "\"1.6.0\""),
+                // cmake CheckTypeSize
+                .define("MMDB_UINT128_USING_MODE", to: "0"),
+                .define("MMDB_UINT128_IS_BYTE_ARRAY", to: "0"),
+                // cmake TestBigEndian
+                .define("MMDB_LITTLE_ENDIAN"),
+            ]),
+        .target(name: "MaxMindDB", dependencies: ["CMaxMindDB"]),
         .testTarget(
-            name: "swift-maxminddbTests",
-            dependencies: ["swift-maxminddb"]),
+            name: "MaxMindDBTests",
+            dependencies: ["MaxMindDB"]),
     ]
 )
