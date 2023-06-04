@@ -16,32 +16,32 @@
 import Foundation
 
 public struct CMaxMindDBError: CustomStringConvertible {
-
-    public let errorCode: Int32
-
-    init(errorCode: Int32) {
-        self.errorCode = errorCode
-    }
-
-    public var description: String {
-        String(cString: MMDB_strerror(errorCode))
-    }
+  
+  public let errorCode: Int32
+  
+  init(errorCode: Int32) {
+    self.errorCode = errorCode
+  }
+  
+  public var description: String {
+    String(cString: MMDB_strerror(errorCode))
+  }
 }
 
 public struct GetaddrinfoError: CustomStringConvertible {
-
-    public let errorCode: Int32
-
-    init(errorCode: Int32) {
-        self.errorCode = errorCode
-    }
-
-    public var description: String {
-        String(cString: gai_strerror(errorCode))
-    }
+  
+  public let errorCode: Int32
+  
+  init(errorCode: Int32) {
+    self.errorCode = errorCode
+  }
+  
+  public var description: String {
+    String(cString: gai_strerror(errorCode))
+  }
 }
 
 public enum MaxMindDBError: Error {
-    case unknowError(CMaxMindDBError)
-    case gaiError(GetaddrinfoError)
+  case unknowError(CMaxMindDBError)
+  case gaiError(GetaddrinfoError)
 }
