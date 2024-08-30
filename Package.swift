@@ -41,7 +41,13 @@ let package = Package(
         .define("PACKAGE_VERSION", to: "\"1.11.0\"")
       ]
     ),
-    .target(name: "MaxMindDB", dependencies: ["CMaxMindDB"]),
+    .target(
+      name: "MaxMindDB",
+      dependencies: ["CMaxMindDB"],
+      resources: [
+        .copy("PrivacyInfo.xcprivacy")
+      ]
+    ),
     .testTarget(
       name: "MaxMindDBTests",
       dependencies: ["MaxMindDB"]),
