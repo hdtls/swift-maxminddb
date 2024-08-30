@@ -13,29 +13,30 @@
 //===----------------------------------------------------------------------===//
 
 @_implementationOnly import CMaxMindDB
-import Foundation
 
-public struct CMaxMindDBError: CustomStringConvertible {
-  
-  public let errorCode: Int32
-  
+/// A wrapper struct for libmaxminddb errors.
+public struct CMaxMindDBError: Equatable, CustomStringConvertible, Sendable {
+
+  private let errorCode: Int32
+
   init(errorCode: Int32) {
     self.errorCode = errorCode
   }
-  
+
   public var description: String {
     String(cString: MMDB_strerror(errorCode))
   }
 }
 
-public struct GetaddrinfoError: CustomStringConvertible {
-  
-  public let errorCode: Int32
-  
+/// A wrapper struct for getaddrinfo errors.
+public struct GetaddrinfoError: Equatable, CustomStringConvertible, Sendable {
+
+  private let errorCode: Int32
+
   init(errorCode: Int32) {
     self.errorCode = errorCode
   }
-  
+
   public var description: String {
     String(cString: gai_strerror(errorCode))
   }
@@ -44,4 +45,18 @@ public struct GetaddrinfoError: CustomStringConvertible {
 public enum MaxMindDBError: Error {
   case unknowError(CMaxMindDBError)
   case gaiError(GetaddrinfoError)
+}
+
+extension MaxMindDBError: Equatable {}
+
+extension MaxMindDBError: CustomStringConvertible {
+
+  public var description: String {
+    switch self {
+    case .unknowError(let cMaxMindDBError):
+      return "MaxMindDBError.unknowError\(cMaxMindDBError.description)"
+    case .gaiError(let getaddrinfoError):
+      return "MaxMindDBError.gaiError\(getaddrinfoError.description)"
+    }
+  }
 }
