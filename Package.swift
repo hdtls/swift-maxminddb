@@ -22,7 +22,7 @@ let package = Package(
     // Products define the executables and libraries a package produces, and make them visible to other packages.
     .library(
       name: "MaxMindDB",
-      targets: ["MaxMindDB"]),
+      targets: ["MaxMindDB"])
   ],
   dependencies: [
     // Dependencies declare other packages that this package depends on.
@@ -35,15 +35,10 @@ let package = Package(
       name: "CMaxMindDB",
       exclude: [
         "hash.txt",
-        "LICENSE.txt"
+        "LICENSE.txt",
       ],
       cSettings: [
-        .define("PACKAGE_VERSION", to: "\"1.7.1\""),
-        // cmake CheckTypeSize
-        .define("MMDB_UINT128_USING_MODE", to: "0"),
-        .define("MMDB_UINT128_IS_BYTE_ARRAY", to: "0"),
-        // cmake TestBigEndian
-        .define("MMDB_LITTLE_ENDIAN"),
+        .define("PACKAGE_VERSION", to: "\"1.11.0\"")
       ]
     ),
     .target(name: "MaxMindDB", dependencies: ["CMaxMindDB"]),
