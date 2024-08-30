@@ -13,22 +13,61 @@
 //===----------------------------------------------------------------------===//
 
 @_implementationOnly import CMaxMindDB
-import Foundation
 
-final public class MaxMindDB: @unchecked Sendable {
+#if os(Windows)
+  import struct WinSDK.sockaddr
+#elseif canImport(Darwin)
+  import Darwin
+#elseif os(Linux) || os(FreeBSD) || os(Android)
+  #if canImport(Glibc)
+    import Glibc
+  #elseif canImport(Musl)
+    import Musl
+  #endif
+  #error("The Socket Addresses module was unable to identify your C library.")
+#else
+  #error("The Socket Addresses module was unable to identify your C library.")
+#endif
 
-  private var db: MMDB_s = .init()
+/// A reference to a MaxMind database object (`MMDB *`).
+///
+final public class MaxMindDB {
 
-  /// Initialize `MaxMindDB` from file path.
-  /// - Parameter file: The path for `mmdb` file.
-  public init(file: String) throws {
+  public enum Mode: UInt32, Sendable {
+    case mmap = 1
+    case mask = 7
+  }
+
+  public var version: String {
+    .init(cString: MMDB_lib_version())
+  }
+
+  private let db: UnsafeMutablePointer<MMDB_s>
+
+  /// Create and open `MaxMindDB` from a file at given path in either mmap or mask mode.
+  ///
+  /// - Parameters:
+  ///   - file: The path to the file to load the database from.
+  ///   - mode: The mode use to open database.
+  public init(file: String, mode: Mode) throws {
+    db = UnsafeMutablePointer.allocate(capacity: MemoryLayout<MMDB_s>.size)
+    db.initialize(to: .init())
+
     let status = file.withCString {
-      MMDB_open($0, UInt32(MMDB_MODE_MMAP), &db)
+      MMDB_open($0, mode.rawValue, db)
     }
 
     guard status == MMDB_SUCCESS else {
       throw MaxMindDBError.unknowError(CMaxMindDBError(errorCode: status))
     }
+  }
+
+  /// Create and open `MaxMindDB` from a file at given path in mmap mode.
+  ///
+  /// - Parameter file: The path to the file to load the database from.
+  @available(*, deprecated, renamed: "MaxMindDB.init(file:mode:)")
+  public convenience init(file: String) throws {
+    try self.init(file: file, mode: .mmap)
   }
 
   /// Looks up an IP address that is passed in.
@@ -41,7 +80,7 @@ final public class MaxMindDB: @unchecked Sendable {
     var error: Int32 = MMDB_SUCCESS
 
     let result = ipAddress.withCString {
-      MMDB_lookup_string(&db, $0, &gaiError, &error)
+      MMDB_lookup_string(db, $0, &gaiError, &error)
     }
 
     guard gaiError == 0 else {
@@ -62,7 +101,7 @@ final public class MaxMindDB: @unchecked Sendable {
     var error: Int32 = MMDB_SUCCESS
 
     let result = withUnsafePointer(to: sockaddr) {
-      MMDB_lookup_sockaddr(&db, $0, &error)
+      MMDB_lookup_sockaddr(db, $0, &error)
     }
 
     guard error == MMDB_SUCCESS else {
@@ -176,6 +215,10 @@ final public class MaxMindDB: @unchecked Sendable {
   }
 
   deinit {
-    MMDB_close(&db)
+    MMDB_close(db)
   }
 }
+
+// MaxMindDB is publicly immutable and we do not internally mutate it after initialisation.
+// It is therefore Sendable.
+extension MaxMindDB: @unchecked Sendable {}
