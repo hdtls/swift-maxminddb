@@ -23,10 +23,13 @@
     import Glibc
   #elseif canImport(Musl)
     import Musl
+  #elseif canImport(Android)
+    import Android
+  #else
+  #error("Unable to identify your C library.")
   #endif
-  #error("The Socket Addresses module was unable to identify your C library.")
 #else
-  #error("The Socket Addresses module was unable to identify your C library.")
+  #error("Unable to identify your C library.")
 #endif
 
 /// A reference to a MaxMind database object (`MMDB *`).
