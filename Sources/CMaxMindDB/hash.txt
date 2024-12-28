@@ -1,1 +1,1 @@
-This directory is derived from libmaxminddb cloned from https://github.com/maxmind/libmaxminddb.git at 1.11.0 (24df335085318a26a5f3aafba12fec3cd322e570).
+This directory is derived from libmaxminddb cloned from https://github.com/maxmind/libmaxminddb.git at revision 36e7226b117ea018d696e479af916524939052c1.
